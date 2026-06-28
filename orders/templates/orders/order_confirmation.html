@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmed — StoreHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="confirmation-card fade-in">
+        <div class="checkmark-circle">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        
+        <h2>Thank You for Your Order!</h2>
+        <p class="text-muted mb-4">Your order has been placed successfully and is now being processed.</p>
+        
+        <div class="confirmation-details">
+            <p>
+                <span class="text-muted">Order Number</span>
+                <strong>#{{ order.order_number }}</strong>
+            </p>
+            <p>
+                <span class="text-muted">Date</span>
+                <span>{{ order.created_at|date:"M d, Y — h:i A" }}</span>
+            </p>
+            <p>
+                <span class="text-muted">Total Amount</span>
+                <strong>₹{{ order.total_amount }}</strong>
+            </p>
+            <p>
+                <span class="text-muted">Payment Method</span>
+                <span>Cash on Delivery</span>
+            </p>
+        </div>
+
+        <div class="delivery-notice">
+            <span aria-hidden="true">🚚</span> <strong>Estimated Delivery:</strong> 3-5 business days
+        </div>
+
+        <div class="confirmation-actions mt-4">
+            <a href="{% url 'products:list' %}" class="btn btn-accent btn-lg">Continue Shopping</a>
+            <a href="{% url 'orders:history' %}" class="btn btn-outline btn-lg">View Order History</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

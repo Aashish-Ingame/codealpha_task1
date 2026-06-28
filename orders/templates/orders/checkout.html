@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout — StoreHub{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="section-header mt-3">
+        <h1>Checkout</h1>
+        <p class="text-muted">Complete your order details</p>
+    </div>
+
+    <div class="checkout-layout">
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  SHIPPING FORM                                         -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <section class="checkout-form-card" aria-label="Shipping details">
+            <h3>Shipping Details</h3>
+
+            <form method="post" action="{% url 'orders:checkout' %}" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.shipping_name.id_for_label }}">Full Name</label>
+                    {{ form.shipping_name }}
+                    {% if form.shipping_name.errors %}<div class="form-error">{{ form.shipping_name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.phone.id_for_label }}">Phone Number</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}<div class="form-error">{{ form.phone.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.address.id_for_label }}">Street Address</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}<div class="form-error">{{ form.address.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.city.id_for_label }}">City</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}<div class="form-error">{{ form.city.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.state.id_for_label }}">State</label>
+                        {{ form.state }}
+                        {% if form.state.errors %}<div class="form-error">{{ form.state.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.postal_code.id_for_label }}">Postal Code</label>
+                    {{ form.postal_code }}
+                    {% if form.postal_code.errors %}<div class="form-error">{{ form.postal_code.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Payment Method -->
+                <div class="payment-method mt-3">
+                    <div class="method-label">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+                        Cash on Delivery (COD)
+                    </div>
+                    <p class="text-muted mt-1" style="margin-bottom:0;font-size:0.85rem;">Pay when you receive your order</p>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg btn-block mt-3">
+                    Place Order
+                </button>
+            </form>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  ORDER SUMMARY                                         -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <aside class="summary-card checkout-summary" aria-label="Order summary">
+            <h3>Order Summary</h3>
+
+            <div style="margin-bottom: var(--space-2);">
+                {% for item in cart.items.all %}
+                <div class="order-item-row">
+                    <span class="item-name">{{ item.quantity }}× {{ item.product.name|truncatechars:25 }}</span>
+                    <span>₹{{ item.subtotal }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <hr class="summary-divider">
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹{{ subtotal }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax (18% GST)</span>
+                <span>₹{{ tax }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span>₹{{ shipping }}</span>
+            </div>
+            <hr class="summary-divider">
+            <div class="summary-row total">
+                <span>Grand Total</span>
+                <span>₹{{ grand_total }}</span>
+            </div>
+        </aside>
+
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,433 @@
+{% extends 'base.html' %}
+{% load static %}
+{% static 'images/placeholder.jpg' as placeholder_url %}
+
+{% block title %}StoreHub — Premium Online Shopping{% endblock %}
+{% block meta_description %}Discover premium products at unbeatable prices. Shop electronics, fashion, books, and more with fast delivery.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+/* Adjust hero height */
+.hero-home {
+    min-height: 380px;
+    background: var(--primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-5) var(--space-3);
+    color: white;
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-6);
+    position: relative;
+    overflow: hidden;
+}
+.hero-home::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(233,69,96,0.15) 0%, transparent 80%);
+    pointer-events: none;
+}
+.hero-home-title { font-family: var(--font-display); font-size: clamp(2.2rem, 5vw, 3rem); margin-bottom: 12px; position: relative; z-index: 1; }
+.hero-home-sub { font-size: 1.2rem; opacity: 0.8; margin-bottom: 32px; position: relative; z-index: 1; }
+.hero-actions { position: relative; z-index: 1; display: flex; gap: 16px; justify-content: center; }
+
+/* Sections */
+.home-section { margin-bottom: 56px; }
+.home-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-4);
+}
+.home-section-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.home-section-link {
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+.home-section-link:hover { text-decoration: underline; }
+
+/* Horizontal Scroll Rows */
+.h-scroll-row {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 16px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.h-scroll-row::-webkit-scrollbar { display: none; }
+.h-scroll-row > * {
+    scroll-snap-align: start;
+    flex: 0 0 calc(25% - 12px); 
+    min-width: 260px; 
+}
+
+/* Category Cards */
+.cat-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+}
+.cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+.cat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--accent);
+}
+.cat-card i {
+    font-size: 2.5rem;
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+.cat-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+.cat-card p { font-size: 0.85rem; color: var(--text-muted); }
+
+/* Spotlight Banners */
+.spotlight-banner {
+    border-radius: var(--radius-xl);
+    padding: 48px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 240px;
+    text-decoration: none;
+    transition: transform var(--transition-slow);
+}
+.spotlight-banner:hover { transform: scale(1.01); }
+.spotlight-banner h2 { font-family: var(--font-display); font-size: 2.4rem; margin-bottom: 8px; }
+.spotlight-banner p { font-size: 1.1rem; opacity: 0.9; margin-bottom: 24px; max-width: 400px; }
+.bg-navy { background: #1a1a2e; }
+.bg-accent { background: #e94560; }
+.bg-blue { background: #16213e; }
+
+/* Product Ribbon Badges */
+.product-card { position: relative; }
+.ribbon {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    z-index: 10;
+    box-shadow: var(--shadow-sm);
+}
+.badge-new {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #10b981;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 4px;
+    z-index: 10;
+    letter-spacing: 1px;
+}
+.badge-save {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 4px;
+    z-index: 10;
+    letter-spacing: 1px;
+}
+
+/* Why choose us styles */
+.lp-features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-3); }
+.lp-feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: var(--space-4) var(--space-3); text-align: center; transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base); }
+.lp-feature-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+.lp-feature-icon-wrap { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-2); font-size: 1.6rem; transition: transform var(--transition-base); }
+.lp-feature-card:hover .lp-feature-icon-wrap { transform: scale(1.12) rotate(-4deg); }
+.icon-bg-red    { background: #fff0f3; color: var(--accent); }
+.icon-bg-blue   { background: #eff6ff; color: #3b82f6; }
+.icon-bg-green  { background: #d1fae5; color: #10b981; }
+.icon-bg-purple { background: #ede9fe; color: #7c3aed; }
+.lp-feature-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+.lp-feature-desc { font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Newsletter */
+.newsletter-band { background: linear-gradient(135deg, var(--accent) 0%, #c73652 50%, #a02543 100%); padding: var(--space-6) var(--space-3); border-radius: var(--radius-xl); text-align: center; color: white; margin-bottom: var(--space-6); }
+.newsletter-band h2 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 8px; }
+.newsletter-band p { color: rgba(255,255,255,0.8); }
+.newsletter-form { display: flex; gap: 8px; max-width: 400px; margin: 24px auto 0; }
+.newsletter-form input { flex: 1; padding: 12px 16px; border-radius: 8px; border: none; outline: none; }
+.newsletter-form button { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 0 24px; font-weight: 700; cursor: pointer; }
+@media (max-width: 480px) {
+    .newsletter-form { flex-direction: column; }
+    .newsletter-form button { padding: 12px 24px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- 1. HERO BANNER -->
+    <section class="hero-home" aria-label="Welcome banner">
+        {% if user.is_authenticated %}
+            <h1 class="hero-home-title">Welcome back, {{ user.first_name|default:user.username }}!</h1>
+            <p class="hero-home-sub">Ready to find something new?</p>
+            <div class="hero-actions">
+                <a href="{% url 'products:list' %}" class="btn btn-accent btn-lg">Continue Shopping</a>
+            </div>
+        {% else %}
+            <h1 class="hero-home-title">Welcome to Store<span class="text-accent">Hub</span></h1>
+            <p class="hero-home-sub">Discover premium products at unbeatable prices.</p>
+            <div class="hero-actions">
+                <a href="{% url 'products:list' %}" class="btn btn-accent btn-lg">Shop Now</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-outline btn-lg" style="border-color:white; color:white;">Create Account</a>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- 2. SHOP BY CATEGORY -->
+    {% if categories %}
+    <section class="home-section" aria-label="Shop by category">
+        <div class="home-section-header">
+            <h2 class="home-section-title"><i class="ti ti-category"></i> Shop by Category</h2>
+        </div>
+        <div class="cat-cards-grid">
+            {% for cat in categories %}
+            <a href="{% url 'products:list' %}?category={{ cat.id }}" class="cat-card">
+                <i class="{{ cat.icon }}"></i>
+                <h3>{{ cat.name }}</h3>
+                <p>{{ cat.count }} items</p>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 3. TODAY'S DEALS (BEST VALUE PICKS) -->
+    {% if deals %}
+    <section class="home-section" aria-label="Best Value Picks">
+        <div class="home-section-header">
+            <h2 class="home-section-title"><i class="ti ti-bolt text-accent"></i> Best Value Picks</h2>
+            <a href="{% url 'products:list' %}?sort=price_asc" class="home-section-link">View All Deals →</a>
+        </div>
+        <div class="h-scroll-row">
+            {% for product in deals %}
+            <article class="product-card">
+                <div class="badge-save">SAVE</div>
+                <a href="{% url 'products:detail' product.slug %}" class="product-img-wrapper" aria-label="View {{ product.name }}">
+                    <span class="product-category-badge">{{ product.get_category_display }}</span>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}'">
+                    {% else %}
+                        <img src="{{ placeholder_url }}" alt="No image available for {{ product.name }}" loading="lazy">
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <div class="product-rating">
+                        <span class="stars" aria-hidden="true">
+                            {% if product.rating >= 1 %}★{% else %}☆{% endif %}{% if product.rating >= 2 %}★{% else %}☆{% endif %}{% if product.rating >= 3 %}★{% else %}☆{% endif %}{% if product.rating >= 4 %}★{% else %}☆{% endif %}{% if product.rating >= 5 %}★{% else %}☆{% endif %}
+                        </span>
+                        <span>{{ product.rating }}/5</span>
+                    </div>
+                    <h3 class="product-title">
+                        <a href="{% url 'products:detail' product.slug %}">{{ product.name }}</a>
+                    </h3>
+                    <div class="product-card-footer">
+                        <span class="product-price"><span class="currency">₹</span>{{ product.price }}</span>
+                        <a href="{% url 'products:detail' product.slug %}" class="btn btn-accent btn-sm">View</a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 6. SPOTLIGHT BANNER 1 -->
+    {% if spotlights.0 %}
+    <section class="home-section">
+        <a href="{% url 'products:list' %}?category={{ spotlights.0.id }}" class="spotlight-banner bg-navy">
+            <h2>{{ spotlights.0.name }}</h2>
+            <p>Power up with our top-rated collection of premium items.</p>
+            <span class="btn btn-accent spotlight-btn">Shop {{ spotlights.0.name }} →</span>
+        </a>
+    </section>
+    {% endif %}
+
+    <!-- 4. BESTSELLERS -->
+    {% if bestsellers %}
+    <section class="home-section" aria-label="Bestsellers">
+        <div class="home-section-header">
+            <h2 class="home-section-title"><i class="ti ti-trending-up"></i> Bestsellers</h2>
+            <a href="{% url 'products:list' %}?sort=rating_desc" class="home-section-link">View All Bestsellers →</a>
+        </div>
+        <div class="product-grid">
+            {% for product in bestsellers %}
+            <article class="product-card">
+                {% if forloop.counter <= 3 %}
+                    <div class="ribbon">{{ forloop.counter }}</div>
+                {% endif %}
+                <a href="{% url 'products:detail' product.slug %}" class="product-img-wrapper" aria-label="View {{ product.name }}">
+                    <span class="product-category-badge">{{ product.get_category_display }}</span>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}'">
+                    {% else %}
+                        <img src="{{ placeholder_url }}" alt="No image available for {{ product.name }}" loading="lazy">
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <div class="product-rating">
+                        <span class="stars" aria-hidden="true">
+                            {% if product.rating >= 1 %}★{% else %}☆{% endif %}{% if product.rating >= 2 %}★{% else %}☆{% endif %}{% if product.rating >= 3 %}★{% else %}☆{% endif %}{% if product.rating >= 4 %}★{% else %}☆{% endif %}{% if product.rating >= 5 %}★{% else %}☆{% endif %}
+                        </span>
+                        <span>{{ product.rating }}/5</span>
+                    </div>
+                    <h3 class="product-title">
+                        <a href="{% url 'products:detail' product.slug %}">{{ product.name }}</a>
+                    </h3>
+                    <div class="product-card-footer">
+                        <span class="product-price"><span class="currency">₹</span>{{ product.price }}</span>
+                        <a href="{% url 'products:detail' product.slug %}" class="btn btn-accent btn-sm">View</a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 6. SPOTLIGHT BANNER 2 -->
+    {% if spotlights.1 %}
+    <section class="home-section">
+        <a href="{% url 'products:list' %}?category={{ spotlights.1.id }}" class="spotlight-banner bg-accent">
+            <h2>{{ spotlights.1.name }}</h2>
+            <p>Discover our latest additions and curated favorites.</p>
+            <span class="btn spotlight-btn" style="color:var(--accent);">Shop {{ spotlights.1.name }} →</span>
+        </a>
+    </section>
+    {% endif %}
+
+    <!-- 5. NEW ARRIVALS -->
+    {% if new_arrivals %}
+    <section class="home-section" aria-label="New Arrivals">
+        <div class="home-section-header">
+            <h2 class="home-section-title"><i class="ti ti-sparkles"></i> New Arrivals</h2>
+            <a href="{% url 'products:list' %}?sort=newest" class="home-section-link">Shop New Arrivals →</a>
+        </div>
+        <div class="product-grid">
+            {% for product in new_arrivals %}
+            <article class="product-card">
+                <div class="badge-new">NEW</div>
+                <a href="{% url 'products:detail' product.slug %}" class="product-img-wrapper" aria-label="View {{ product.name }}">
+                    <span class="product-category-badge">{{ product.get_category_display }}</span>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}'">
+                    {% else %}
+                        <img src="{{ placeholder_url }}" alt="No image available for {{ product.name }}" loading="lazy">
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <div class="product-rating">
+                        <span class="stars" aria-hidden="true">
+                            {% if product.rating >= 1 %}★{% else %}☆{% endif %}{% if product.rating >= 2 %}★{% else %}☆{% endif %}{% if product.rating >= 3 %}★{% else %}☆{% endif %}{% if product.rating >= 4 %}★{% else %}☆{% endif %}{% if product.rating >= 5 %}★{% else %}☆{% endif %}
+                        </span>
+                        <span>{{ product.rating }}/5</span>
+                    </div>
+                    <h3 class="product-title">
+                        <a href="{% url 'products:detail' product.slug %}">{{ product.name }}</a>
+                    </h3>
+                    <div class="product-card-footer">
+                        <span class="product-price"><span class="currency">₹</span>{{ product.price }}</span>
+                        <a href="{% url 'products:detail' product.slug %}" class="btn btn-accent btn-sm">View</a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 7. WHY CHOOSE US -->
+    <section class="home-section" aria-label="Why shop at StoreHub">
+        <div class="home-section-header" style="justify-content: center;">
+            <h2 class="home-section-title">Why Choose StoreHub?</h2>
+        </div>
+        <div class="lp-features-grid">
+            <div class="lp-feature-card">
+                <div class="lp-feature-icon-wrap icon-bg-red" aria-hidden="true">
+                    <i class="ti ti-truck"></i>
+                </div>
+                <p class="lp-feature-title">Free Shipping</p>
+                <p class="lp-feature-desc">Free delivery on orders above ₹500. Fast dispatch.</p>
+            </div>
+            <div class="lp-feature-card">
+                <div class="lp-feature-icon-wrap icon-bg-blue" aria-hidden="true">
+                    <i class="ti ti-lock"></i>
+                </div>
+                <p class="lp-feature-title">Secure Payments</p>
+                <p class="lp-feature-desc">100% safe, encrypted checkout.</p>
+            </div>
+            <div class="lp-feature-card">
+                <div class="lp-feature-icon-wrap icon-bg-green" aria-hidden="true">
+                    <i class="ti ti-rotate"></i>
+                </div>
+                <p class="lp-feature-title">Easy Returns</p>
+                <p class="lp-feature-desc">Return it hassle-free within 30 days.</p>
+            </div>
+            <div class="lp-feature-card">
+                <div class="lp-feature-icon-wrap icon-bg-purple" aria-hidden="true">
+                    <i class="ti ti-headset"></i>
+                </div>
+                <p class="lp-feature-title">24/7 Support</p>
+                <p class="lp-feature-desc">Our team is always here to help.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. NEWSLETTER CTA -->
+    <section class="newsletter-band" aria-label="Newsletter signup">
+        <h2>Get 10% Off Your First Order</h2>
+        <p>Subscribe to our newsletter and unlock an exclusive discount.</p>
+        <form class="newsletter-form" action="#" method="post">
+            {% csrf_token %}
+            <input type="email" placeholder="your@email.com" required aria-label="Email address">
+            <button type="button">Subscribe</button>
+        </form>
+    </section>
+
+</div>
+{% endblock content %}

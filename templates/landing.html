@@ -1,0 +1,929 @@
+{% load static %}
+{% static 'images/placeholder.jpg' as placeholder_url %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="StoreHub — Premium online shopping with unbeatable prices on electronics, fashion, books and more. Free shipping over ₹500.">
+    <title>StoreHub — Shop Premium Products Online</title>
+
+    <!-- Preconnect for Google Fonts performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Tabler Icons CDN (used for Why Choose Us section) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+    <!-- Global design system -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Landing-page-specific styles (scoped to avoid polluting global CSS) -->
+    <style>
+        /* ── Landing Navbar ─────────────────────────────────────────── */
+        .lp-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: var(--navbar-height);
+            background: transparent;
+            border-bottom: 1px solid transparent;
+            transition:
+                background var(--transition-base),
+                border-color var(--transition-base),
+                box-shadow var(--transition-base);
+        }
+        .lp-navbar.scrolled {
+            background: var(--surface);
+            border-color: var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        .lp-nav-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-3);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .lp-logo {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        .lp-logo span { color: var(--accent); }
+        .lp-navbar.scrolled .lp-logo { color: var(--text-primary); }
+        .lp-nav-actions { display: flex; gap: var(--space-1); align-items: center; }
+        .lp-btn-login {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            padding: 8px 20px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid rgba(255,255,255,0.4);
+            background: transparent;
+            text-decoration: none;
+            transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+            white-space: nowrap;
+        }
+        .lp-btn-login:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.7); }
+        .lp-navbar.scrolled .lp-btn-login { color: var(--text-primary); border-color: var(--border-strong); }
+        .lp-navbar.scrolled .lp-btn-login:hover { background: var(--surface-3); }
+
+        /* ── Hero ────────────────────────────────────────────────────── */
+        .lp-hero {
+            min-height: 90vh;
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: calc(var(--navbar-height) + var(--space-6)) var(--space-3) var(--space-8);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Decorative radial glow */
+        .lp-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 55% at 50% 40%, rgba(233,69,96,0.18) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 80% 70%, rgba(15,52,96,0.5) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        /* Animated floating blobs */
+        .lp-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.12;
+            pointer-events: none;
+            animation: blobFloat 8s ease-in-out infinite alternate;
+        }
+        .lp-blob-1 { width: 420px; height: 420px; background: var(--accent); top: -80px; left: -100px; animation-delay: 0s; }
+        .lp-blob-2 { width: 300px; height: 300px; background: #4361ee; bottom: 40px; right: -80px; animation-delay: -3s; }
+        @keyframes blobFloat {
+            from { transform: translateY(0) scale(1); }
+            to   { transform: translateY(30px) scale(1.08); }
+        }
+        @media (prefers-reduced-motion: reduce) { .lp-blob { animation: none; } }
+
+        .lp-hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 820px;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        .lp-hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(233,69,96,0.18);
+            border: 1px solid rgba(233,69,96,0.35);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: var(--radius-full);
+            margin-bottom: var(--space-2);
+        }
+        .lp-hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.4rem, 6vw, 4rem);
+            font-weight: 700;
+            color: white;
+            line-height: 1.1;
+            margin-bottom: var(--space-2);
+        }
+        .lp-hero-title .accent-word { color: var(--accent); }
+        .lp-typewriter-wrap {
+            min-height: 2em;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: rgba(255,255,255,0.7);
+            margin-bottom: var(--space-3);
+        }
+        .lp-hero-actions {
+            display: flex;
+            gap: var(--space-2);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: var(--space-4);
+            animation: fadeInUp 0.8s 0.25s ease both;
+        }
+        .lp-btn-cta-outline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 14px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(255,255,255,0.5);
+            color: white;
+            background: transparent;
+            text-decoration: none;
+            transition: background var(--transition-fast), border-color var(--transition-fast);
+            white-space: nowrap;
+        }
+        .lp-btn-cta-outline:hover { background: rgba(255,255,255,0.1); border-color: white; }
+        .lp-trust-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s 0.4s ease both;
+        }
+        .lp-trust-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+        }
+        .lp-trust-item svg { color: var(--accent); flex-shrink: 0; }
+        .lp-trust-divider { color: rgba(255,255,255,0.2); font-size: 1.1rem; }
+
+        /* Scroll hint arrow */
+        .lp-scroll-hint {
+            position: absolute;
+            bottom: var(--space-3);
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.3);
+            animation: bounceDown 2s ease-in-out infinite;
+        }
+        @keyframes bounceDown {
+            0%,100% { transform: translateX(-50%) translateY(0); }
+            50%      { transform: translateX(-50%) translateY(8px); }
+        }
+        @media (prefers-reduced-motion: reduce) { .lp-scroll-hint { animation: none; } }
+
+        /* ── Shared Section Wrapper ──────────────────────────────────── */
+        .lp-section {
+            padding: var(--space-8) 0;
+        }
+        .lp-section-alt {
+            background: var(--surface-2);
+        }
+        .lp-section-header {
+            text-align: center;
+            margin-bottom: var(--space-5);
+        }
+        .lp-section-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: var(--space-1);
+        }
+        .lp-section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+        .lp-section-sub {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* ── Why Choose Us ───────────────────────────────────────────── */
+        .lp-features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-3);
+        }
+        .lp-feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4) var(--space-3);
+            text-align: center;
+            transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+        }
+        .lp-feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+        .lp-feature-icon-wrap {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-2);
+            font-size: 1.6rem;
+            transition: transform var(--transition-base);
+        }
+        .lp-feature-card:hover .lp-feature-icon-wrap { transform: scale(1.12) rotate(-4deg); }
+        .icon-bg-red    { background: #fff0f3; color: var(--accent); }
+        .icon-bg-blue   { background: #eff6ff; color: #3b82f6; }
+        .icon-bg-green  { background: #d1fae5; color: #10b981; }
+        .icon-bg-purple { background: #ede9fe; color: #7c3aed; }
+        .lp-feature-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .lp-feature-desc { font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* ── Category Showcase ───────────────────────────────────────── */
+        .lp-category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-3);
+        }
+        .lp-category-card {
+            position: relative;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            display: block;
+            text-decoration: none;
+        }
+        .lp-category-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-slow);
+            display: block;
+        }
+        .lp-category-card:hover .lp-category-img { transform: scale(1.07); }
+        .lp-category-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10,10,20,0.80) 0%, rgba(10,10,20,0.2) 55%, transparent 100%);
+            transition: background var(--transition-base);
+        }
+        .lp-category-card:hover .lp-category-overlay {
+            background: linear-gradient(to top, rgba(233,69,96,0.7) 0%, rgba(10,10,20,0.3) 60%, transparent 100%);
+        }
+        .lp-category-label {
+            position: absolute;
+            bottom: var(--space-3);
+            left: var(--space-3);
+            color: white;
+        }
+        .lp-category-label strong {
+            display: block;
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        .lp-category-label span {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+        .lp-category-arrow {
+            position: absolute;
+            top: var(--space-2);
+            right: var(--space-2);
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity var(--transition-fast), transform var(--transition-fast);
+        }
+        .lp-category-card:hover .lp-category-arrow { opacity: 1; transform: scale(1); }
+
+        /* ── Testimonials ────────────────────────────────────────────── */
+        .lp-testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-3);
+        }
+        .lp-testimonial-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            transition: transform var(--transition-base), box-shadow var(--transition-base);
+        }
+        .lp-testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .lp-stars { color: #f59e0b; font-size: 1rem; letter-spacing: 2px; }
+        .lp-testimonial-quote {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            flex: 1;
+            font-style: italic;
+        }
+        .lp-testimonial-quote::before { content: '\201C'; color: var(--accent); font-size: 1.4rem; line-height: 0; vertical-align: -0.3em; margin-right: 2px; }
+        .lp-testimonial-footer { display: flex; align-items: center; gap: var(--space-1); }
+        .lp-testimonial-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-full);
+            background: var(--accent);
+            color: white;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .lp-testimonial-name { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
+        .lp-testimonial-meta { font-size: 0.78rem; color: var(--text-muted); }
+
+        /* ── Newsletter CTA Band ──────────────────────────────────────── */
+        .lp-newsletter {
+            background: linear-gradient(135deg, var(--accent) 0%, #c73652 50%, #a02543 100%);
+            padding: var(--space-8) 0;
+        }
+        .lp-newsletter-inner {
+            max-width: 680px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0 var(--space-3);
+        }
+        .lp-newsletter-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: var(--radius-full);
+            margin-bottom: var(--space-2);
+        }
+        .lp-newsletter-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+            color: white;
+            margin-bottom: var(--space-1);
+        }
+        .lp-newsletter-sub {
+            color: rgba(255,255,255,0.75);
+            font-size: 0.95rem;
+            margin-bottom: var(--space-3);
+        }
+        .lp-newsletter-form {
+            display: flex;
+            gap: var(--space-1);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        .lp-newsletter-input {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.12);
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color var(--transition-fast), background var(--transition-fast);
+        }
+        .lp-newsletter-input::placeholder { color: rgba(255,255,255,0.55); }
+        .lp-newsletter-input:focus { border-color: white; background: rgba(255,255,255,0.2); }
+        .lp-newsletter-btn {
+            padding: 14px 28px;
+            background: white;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background var(--transition-fast), transform var(--transition-fast);
+        }
+        .lp-newsletter-btn:hover { background: var(--accent-light); transform: translateY(-2px); }
+        .lp-newsletter-disclaimer {
+            margin-top: var(--space-1);
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* ── Responsive ──────────────────────────────────────────────── */
+        @media (max-width: 1024px) {
+            .lp-features-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .lp-features-grid      { grid-template-columns: repeat(2, 1fr); gap: var(--space-2); }
+            .lp-category-grid      { grid-template-columns: 1fr; }
+            .lp-testimonials-grid  { grid-template-columns: 1fr; }
+            .lp-newsletter-form    { flex-direction: column; }
+            .lp-newsletter-btn     { width: 100%; }
+            .lp-hero-actions       { flex-direction: column; align-items: center; }
+            .lp-hero-actions .btn,
+            .lp-btn-cta-outline    { width: 100%; max-width: 320px; }
+        }
+        @media (max-width: 480px) {
+            .lp-features-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!--  NAVBAR — transparent over hero, solid on scroll                   -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<header class="lp-navbar" id="lp-navbar" role="banner">
+    <nav class="lp-nav-inner" aria-label="Main navigation">
+        <a href="{% url 'landing' %}" class="lp-logo" aria-label="StoreHub home">
+            Store<span>Hub</span>
+        </a>
+        <div class="lp-nav-actions">
+            <a href="{% url 'accounts:login' %}" class="lp-btn-login">Login</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-accent btn-sm">Register</a>
+        </div>
+    </nav>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!--  HERO — full-viewport, dark background                             -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="lp-hero" aria-label="Welcome to StoreHub">
+    <!-- Floating blobs (decorative) -->
+    <div class="lp-blob lp-blob-1" aria-hidden="true"></div>
+    <div class="lp-blob lp-blob-2" aria-hidden="true"></div>
+
+    <div class="lp-hero-content">
+        <!-- Eyebrow label -->
+        <div class="lp-hero-eyebrow" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            India's Premium Shopping Destination
+        </div>
+
+        <!-- Main heading -->
+        <h1 class="lp-hero-title">
+            Welcome to Store<span class="accent-word">Hub</span>
+        </h1>
+
+        <!-- Typewriter rotating subtitles -->
+        <div class="lp-typewriter-wrap" aria-live="polite">
+            <span id="typewriter-text"
+                  data-text="Premium products at unbeatable prices."
+                  data-phrases='["Premium products at unbeatable prices.", "Delivered fast to your doorstep.", "Shop smarter, save more.", "Trusted by 10,000+ customers."]'></span><span
+                  class="typewriter-cursor" id="typewriter-cursor" style="display:none;">|</span>
+        </div>
+
+        <!-- CTAs -->
+        <div class="lp-hero-actions">
+            <a href="{% url 'products:list' %}" class="btn btn-accent btn-lg" id="hero-shop-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                Shop Now
+            </a>
+            <a href="{% url 'accounts:register' %}" class="lp-btn-cta-outline" id="hero-register-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Create Account — It's Free
+            </a>
+        </div>
+
+        <!-- Trust row -->
+        <div class="lp-trust-row">
+            <span class="lp-trust-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                10,000+ happy customers
+            </span>
+            <span class="lp-trust-divider" aria-hidden="true">·</span>
+            <span class="lp-trust-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                Free shipping over ₹500
+            </span>
+            <span class="lp-trust-divider" aria-hidden="true">·</span>
+            <span class="lp-trust-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Secure 100% payments
+            </span>
+        </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="lp-scroll-hint" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+    </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!--  FEATURED PRODUCTS — "Trending This Week"                          -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="lp-section" aria-label="Trending products">
+    <div class="container">
+
+        <div class="lp-section-header">
+            <span class="lp-section-tag">🔥 Hot right now</span>
+            <h2 class="lp-section-title">Trending This Week</h2>
+            <p class="lp-section-sub">Our highest-rated products, hand-picked for you.</p>
+        </div>
+
+        {% if featured_products %}
+        <div class="product-grid">
+            {% for product in featured_products %}
+            <article class="product-card">
+                <a href="{% url 'products:detail' product.slug %}" class="product-img-wrapper"
+                   aria-label="View {{ product.name }}">
+                    <span class="product-category-badge">{{ product.get_category_display }}</span>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}"
+                             alt="{{ product.name }}"
+                             loading="lazy"
+                             onerror="this.onerror=null;this.src='{{ placeholder_url }}'">
+                    {% else %}
+                        <img src="{{ placeholder_url }}"
+                             alt="No image available for {{ product.name }}"
+                             loading="lazy">
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <div class="product-rating">
+                        <span class="stars" aria-hidden="true">
+                            {% if product.rating >= 1 %}★{% else %}☆{% endif %}{% if product.rating >= 2 %}★{% else %}☆{% endif %}{% if product.rating >= 3 %}★{% else %}☆{% endif %}{% if product.rating >= 4 %}★{% else %}☆{% endif %}{% if product.rating >= 5 %}★{% else %}☆{% endif %}
+                        </span>
+                        <span>{{ product.rating }}/5</span>
+                    </div>
+                    <h3 class="product-title">
+                        <a href="{% url 'products:detail' product.slug %}">{{ product.name }}</a>
+                    </h3>
+                    <div class="product-card-footer">
+                        <span class="product-price"><span class="currency">₹</span>{{ product.price }}</span>
+                        <a href="{% url 'products:detail' product.slug %}" class="btn btn-accent btn-sm">View</a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'products:list' %}" class="btn btn-outline-accent">
+                Browse All Products →
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!--  WHY CHOOSE US — 4 feature cards with Tabler icons                 -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="lp-section lp-section-alt" aria-label="Why shop at StoreHub">
+    <div class="container">
+
+        <div class="lp-section-header">
+            <span class="lp-section-tag">✦ Our promise</span>
+            <h2 class="lp-section-title">Why Choose StoreHub?</h2>
+            <p class="lp-section-sub">Everything we do is designed around your shopping experience.</p>
+        </div>
+
+        <div class="lp-features-grid">
+
+            <div class="lp-feature-card fade-in">
+                <div class="lp-feature-icon-wrap icon-bg-red" aria-hidden="true">
+                    <i class="ti ti-truck" style="font-size:1.8rem;"></i>
+                </div>
+                <p class="lp-feature-title">Free Shipping</p>
+                <p class="lp-feature-desc">Free delivery on all orders above ₹500. Fast dispatch, reliable couriers.</p>
+            </div>
+
+            <div class="lp-feature-card fade-in" style="animation-delay:.08s;">
+                <div class="lp-feature-icon-wrap icon-bg-blue" aria-hidden="true">
+                    <i class="ti ti-lock" style="font-size:1.8rem;"></i>
+                </div>
+                <p class="lp-feature-title">Secure Payments</p>
+                <p class="lp-feature-desc">SSL-encrypted checkout. We never store your card details. 100% safe.</p>
+            </div>
+
+            <div class="lp-feature-card fade-in" style="animation-delay:.16s;">
+                <div class="lp-feature-icon-wrap icon-bg-green" aria-hidden="true">
+                    <i class="ti ti-rotate" style="font-size:1.8rem;"></i>
+                </div>
+                <p class="lp-feature-title">Easy Returns</p>
+                <p class="lp-feature-desc">Not happy? Return it hassle-free within 30 days, no questions asked.</p>
+            </div>
+
+            <div class="lp-feature-card fade-in" style="animation-delay:.24s;">
+                <div class="lp-feature-icon-wrap icon-bg-purple" aria-hidden="true">
+                    <i class="ti ti-headset" style="font-size:1.8rem;"></i>
+                </div>
+                <p class="lp-feature-title">24/7 Support</p>
+                <p class="lp-feature-desc">Our team is always here to help — chat, email, or call anytime.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!--  CATEGORY SHOWCASE — Electronics, Fashion, Books                   -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="lp-section" aria-label="Shop by category">
+    <div class="container">
+
+        <div class="lp-section-header">
+            <span class="lp-section-tag">🗂 Browse by category</span>
+            <h2 class="lp-section-title">Find What You Love</h2>
+            <p class="lp-section-sub">Dive into our curated collections across top categories.</p>
+        </div>
+
+        <div class="lp-category-grid">
+            {% for cat in categories %}
+            <a href="{% url 'products:list' %}?category={{ cat.slug }}"
+               class="lp-category-card"
+               aria-label="Shop {{ cat.name }}">
+                <img src="{{ cat.image_url }}"
+                     alt="{{ cat.name }} products"
+                     class="lp-category-img"
+                     loading="lazy"
+                     onerror="this.onerror=null;this.style.background='var(--surface-3)';">
+                <div class="lp-category-overlay"></div>
+                <div class="lp-category-label">
+                    <strong>{{ cat.name }}</strong>
+                    <span>Shop now →</span>
+                </div>
+                <div class="lp-category-arrow" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!--  TESTIMONIALS — 3 customer quotes                                   -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="lp-section lp-section-alt" aria-label="Customer testimonials">
+    <div class="container">
+
+        <div class="lp-section-header">
+            <span class="lp-section-tag">💬 Happy shoppers</span>
+            <h2 class="lp-section-title">What Our Customers Say</h2>
+            <p class="lp-section-sub">Real reviews from real people who love shopping with us.</p>
+        </div>
+
+        <div class="lp-testimonials-grid">
+
+            <article class="lp-testimonial-card fade-in">
+                <div class="lp-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <p class="lp-testimonial-quote">The delivery was incredibly fast and the packaging was immaculate. The laptop I ordered was exactly as described — StoreHub has become my go-to for all tech purchases!</p>
+                <footer class="lp-testimonial-footer">
+                    <div class="lp-testimonial-avatar" aria-hidden="true">R</div>
+                    <div>
+                        <p class="lp-testimonial-name">Rahul Sharma</p>
+                        <p class="lp-testimonial-meta">Electronics · Verified Buyer</p>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="lp-testimonial-card fade-in" style="animation-delay:.1s;">
+                <div class="lp-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <p class="lp-testimonial-quote">I ordered three books and they arrived the next morning! The prices beat every other site I checked. Returns are painless too — I tested that, unfortunately 😄</p>
+                <footer class="lp-testimonial-footer">
+                    <div class="lp-testimonial-avatar" aria-hidden="true" style="background:#7c3aed;">P</div>
+                    <div>
+                        <p class="lp-testimonial-name">Priya Nair</p>
+                        <p class="lp-testimonial-meta">Books · Verified Buyer</p>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="lp-testimonial-card fade-in" style="animation-delay:.2s;">
+                <div class="lp-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <p class="lp-testimonial-quote">Amazing quality clothes at a fraction of what I'd pay on other platforms. The denim jacket looks even better in person. Customer support was incredibly responsive!</p>
+                <footer class="lp-testimonial-footer">
+                    <div class="lp-testimonial-avatar" aria-hidden="true" style="background:#10b981;">A</div>
+                    <div>
+                        <p class="lp-testimonial-name">Arjun Mehta</p>
+                        <p class="lp-testimonial-meta">Fashion · Verified Buyer</p>
+                    </div>
+                </footer>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!--  NEWSLETTER CTA BAND                                               -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="lp-newsletter" aria-label="Newsletter signup">
+    <div class="lp-newsletter-inner">
+        <div class="lp-newsletter-tag">Limited offer</div>
+        <h2 class="lp-newsletter-title">Get 10% Off Your First Order</h2>
+        <p class="lp-newsletter-sub">Subscribe to our newsletter and unlock an exclusive discount on your first purchase.</p>
+        <form class="lp-newsletter-form" action="#" method="post" aria-label="Newsletter subscription form">
+            {% csrf_token %}
+            <label for="newsletter-email" class="visually-hidden">Your email address</label>
+            <input type="email"
+                   id="newsletter-email"
+                   name="email"
+                   class="lp-newsletter-input"
+                   placeholder="your@email.com"
+                   required
+                   autocomplete="email">
+            <button type="submit" class="lp-newsletter-btn" id="newsletter-subscribe-btn">
+                Subscribe
+            </button>
+        </form>
+        <p class="lp-newsletter-disclaimer">No spam, ever. Unsubscribe anytime.</p>
+    </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!--  FOOTER — reuse the existing site footer                           -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<footer class="site-footer" role="contentinfo">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="{% url 'home' %}" class="nav-logo">Store<span>Hub</span></a>
+                <p>Your one-stop destination for premium products. Quality, value, and a seamless shopping experience — delivered to your doorstep.</p>
+            </div>
+
+            <nav class="footer-col" aria-label="Shop links">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="{% url 'products:list' %}">All Products</a></li>
+                    <li><a href="{% url 'products:list' %}?category=electronics">Electronics</a></li>
+                    <li><a href="{% url 'products:list' %}?category=clothing">Fashion</a></li>
+                    <li><a href="{% url 'products:list' %}?category=books">Books</a></li>
+                </ul>
+            </nav>
+
+            <nav class="footer-col" aria-label="Account links">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="{% url 'accounts:login' %}">Login</a></li>
+                    <li><a href="{% url 'accounts:register' %}">Register</a></li>
+                </ul>
+            </nav>
+
+            <div class="footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Shipping Info</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 StoreHub. All rights reserved. Built with Django.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Toast container (for newsletter confirmation) -->
+<aside class="toast-container" aria-live="polite"></aside>
+
+<!-- JavaScript -->
+<script src="{% static 'js/main.js' %}"></script>
+
+<script>
+/* ── Landing page specific JS ─────────────────────────────────────── */
+(function () {
+    'use strict';
+
+    /* Navbar: transparent → solid on scroll */
+    const navbar = document.getElementById('lp-navbar');
+    if (navbar) {
+        const update = () => navbar.classList.toggle('scrolled', window.scrollY > 60);
+        window.addEventListener('scroll', update, { passive: true });
+        update();
+    }
+
+    /* Typewriter: override initTypewriter to use data-phrases array */
+    const tw    = document.getElementById('typewriter-text');
+    const twCur = document.getElementById('typewriter-cursor');
+
+    if (tw && twCur) {
+        let phrases;
+        try { phrases = JSON.parse(tw.dataset.phrases); } catch (_) { phrases = [tw.dataset.text]; }
+
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        tw.textContent = '';
+        twCur.style.display = 'inline';
+
+        if (prefersReduced) {
+            tw.textContent = phrases[0];
+            return;
+        }
+
+        let pi = 0, ci = 0, del = false;
+
+        function tick() {
+            const cur = phrases[pi];
+            if (!del) {
+                tw.textContent = cur.slice(0, ci + 1);
+                ci++;
+                if (ci === cur.length) { setTimeout(() => { del = true; tick(); }, 2400); return; }
+                setTimeout(tick, 65);
+            } else {
+                tw.textContent = cur.slice(0, ci - 1);
+                ci--;
+                if (ci === 0) { del = false; pi = (pi + 1) % phrases.length; setTimeout(tick, 380); return; }
+                setTimeout(tick, 28);
+            }
+        }
+        setTimeout(tick, 700);
+    }
+
+    /* Newsletter form — show toast instead of real submit */
+    const nlForm = document.querySelector('.lp-newsletter-form');
+    if (nlForm) {
+        nlForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const email = document.getElementById('newsletter-email').value;
+            if (!email) return;
+            // Show success toast
+            if (typeof showToast === 'function') {
+                showToast('🎉 Subscribed! Check your inbox for your 10% discount code.', 'success');
+            }
+            nlForm.reset();
+        });
+    }
+
+})();
+</script>
+
+</body>
+</html>

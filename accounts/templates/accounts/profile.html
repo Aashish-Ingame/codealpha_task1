@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Account — StoreHub{% endblock %}
+{% block meta_description %}Manage your StoreHub profile, view order history, and update your contact details.{% endblock %}
+
+{% block content %}
+
+{# ── Page container — max-width 1100px, centred, breathes from navbar ── #}
+<div class="profile-page-wrap">
+<div class="profile-container">
+
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!--  PROFILE HERO HEADER                                            -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <header class="profile-hero fade-in" aria-label="Profile overview">
+
+        {# Avatar: proper circle left of name/email, flex row #}
+        <div class="profile-avatar" aria-hidden="true">
+            {{ user.full_name|default:user.username|first|upper }}
+        </div>
+
+        <div class="profile-hero-details">
+            <h1 class="profile-hero-name">
+                {{ user.full_name|default:user.username }}
+            </h1>
+            <p class="profile-hero-email">{{ user.email }}</p>
+            <span class="member-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Member since {{ user.date_joined|date:"F Y" }}
+            </span>
+        </div>
+
+        {# Edit toggle — sits at right edge of hero #}
+        <button class="btn profile-edit-trigger-btn"
+                id="profile-edit-trigger"
+                aria-expanded="false"
+                aria-controls="profile-edit-section"
+                type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit Profile
+        </button>
+
+    </header>
+
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!--  TOGGLE CONTAINER                                               -->
+    <!--  .editing class swaps read-only ↔ edit form                    -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <div class="profile-content-area {% if edit_mode %}editing{% endif %}"
+         id="profile-content-area">
+
+        <!-- ── READ-ONLY INFO GRID ──────────────────────────────────── -->
+        <section class="profile-info-grid fade-in"
+                 id="profile-info-section"
+                 aria-label="Account information">
+
+            <div class="info-card">
+                <span class="info-card-label">Full Name</span>
+                {% if user.full_name %}
+                    <span class="info-card-value">{{ user.full_name }}</span>
+                {% else %}
+                    <span class="info-card-value info-card-empty">Not provided</span>
+                {% endif %}
+            </div>
+
+            <div class="info-card">
+                <span class="info-card-label">Phone Number</span>
+                {% if user.phone %}
+                    <span class="info-card-value">{{ user.phone }}</span>
+                {% else %}
+                    <span class="info-card-value info-card-empty">Not provided</span>
+                {% endif %}
+            </div>
+
+            <div class="info-card">
+                <span class="info-card-label">Email Address</span>
+                <span class="info-card-value">{{ user.email }}</span>
+            </div>
+
+            <div class="info-card">
+                <span class="info-card-label">Delivery Address</span>
+                {% if user.address %}
+                    <span class="info-card-value profile-address">{{ user.address }}</span>
+                {% else %}
+                    <span class="info-card-value info-card-empty">Not provided</span>
+                {% endif %}
+            </div>
+
+        </section>
+
+        <!-- ── EDIT FORM (hidden until .editing is toggled on) ──────── -->
+        <section class="edit-card"
+                 id="profile-edit-section"
+                 aria-label="Edit profile form">
+
+            <div class="edit-card-header">
+                <h2 class="edit-card-title">Edit Profile</h2>
+                <p class="edit-card-subtitle">Update your personal details below.</p>
+            </div>
+
+            {# Server-side errors (only shown when edit_mode=True after bad POST) #}
+            {% if edit_mode and profile_form.non_field_errors %}
+            <div class="form-errors" role="alert">
+                {{ profile_form.non_field_errors|join:" " }}
+            </div>
+            {% endif %}
+
+            <form method="post"
+                  action="{% url 'accounts:profile' %}"
+                  id="profile-edit-form"
+                  novalidate>
+                {% csrf_token %}
+
+                <div class="edit-fields-grid">
+
+                    <!-- Full Name -->
+                    <div class="profile-form-group">
+                        <label for="id_full_name">Full Name</label>
+                        <input type="text"
+                               id="id_full_name"
+                               name="full_name"
+                               value="{{ profile_form.full_name.value|default:'' }}"
+                               maxlength="150"
+                               autocomplete="name"
+                               placeholder="Your full name"
+                               {% if profile_form.full_name.errors %}class="field-error"{% endif %}>
+                        {% if profile_form.full_name.errors %}
+                            <span class="field-error-msg" role="alert">{{ profile_form.full_name.errors|join:", " }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="profile-form-group">
+                        <label for="id_phone">Phone Number</label>
+                        <input type="tel"
+                               id="id_phone"
+                               name="phone"
+                               value="{{ profile_form.phone.value|default:'' }}"
+                               maxlength="20"
+                               autocomplete="tel"
+                               placeholder="+91-XXXXXXXXXX"
+                               {% if profile_form.phone.errors %}class="field-error"{% endif %}>
+                        {% if profile_form.phone.errors %}
+                            <span class="field-error-msg" role="alert">{{ profile_form.phone.errors|join:", " }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email — full width -->
+                    <div class="profile-form-group full-width">
+                        <label for="id_email">Email Address</label>
+                        <input type="email"
+                               id="id_email"
+                               name="email"
+                               value="{{ profile_form.email.value|default:'' }}"
+                               autocomplete="email"
+                               placeholder="your@email.com"
+                               {% if profile_form.email.errors %}class="field-error"{% endif %}>
+                        {% if profile_form.email.errors %}
+                            <span class="field-error-msg" role="alert">{{ profile_form.email.errors|join:", " }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Address — full width -->
+                    <div class="profile-form-group full-width">
+                        <label for="id_address">Delivery Address</label>
+                        <textarea id="id_address"
+                                  name="address"
+                                  rows="3"
+                                  autocomplete="street-address"
+                                  placeholder="Street address, city, state, PIN…"
+                                  {% if profile_form.address.errors %}class="field-error"{% endif %}>{{ profile_form.address.value|default:'' }}</textarea>
+                        {% if profile_form.address.errors %}
+                            <span class="field-error-msg" role="alert">{{ profile_form.address.errors|join:", " }}</span>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="edit-card-actions">
+                    <button type="submit" class="btn btn-accent" id="profile-save-btn">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                            <polyline points="17 21 17 13 7 13 7 21"/>
+                            <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        Save Changes
+                    </button>
+                    <button type="button" class="btn btn-ghost" id="profile-cancel-btn">
+                        Cancel
+                    </button>
+                </div>
+
+            </form>
+        </section>
+
+    </div><!-- /profile-content-area -->
+
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!--  ORDER HISTORY                                                  -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <section class="profile-orders-section fade-in"
+             style="animation-delay: 0.2s;"
+             aria-label="Order history">
+
+        <div class="orders-section-header">
+            <h2 class="orders-section-title">Order History</h2>
+            {% if orders %}
+                <a href="{% url 'orders:history' %}" class="btn btn-ghost btn-sm">
+                    View All →
+                </a>
+            {% endif %}
+        </div>
+
+        {% if orders %}
+            <div class="order-cards-list" role="list">
+                {% for order in orders|slice:":5" %}
+                <article class="order-card" role="listitem">
+
+                    <div class="order-card-left">
+                        <span class="order-card-number">{{ order.order_number }}</span>
+                        <time class="order-card-date"
+                              datetime="{{ order.created_at|date:'Y-m-d' }}">
+                            {{ order.created_at|date:"d M Y" }}
+                        </time>
+                    </div>
+
+                    <div class="order-card-centre">
+                        <span class="order-card-items">
+                            {{ order.items.count }} item{{ order.items.count|pluralize }}
+                        </span>
+                    </div>
+
+                    <div class="order-card-right">
+                        <span class="status-badge status-{{ order.status }}">
+                            {{ order.get_status_display }}
+                        </span>
+                        <span class="order-card-total">₹{{ order.total_amount }}</span>
+                        <a href="{% url 'orders:detail' order.id %}"
+                           class="btn btn-outline btn-sm"
+                           aria-label="View order {{ order.order_number }}">
+                            Details
+                        </a>
+                    </div>
+
+                </article>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <div class="orders-empty-state">
+                <div class="orders-empty-icon" aria-hidden="true">
+                    <svg width="52" height="52" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                </div>
+                <h3>No orders yet</h3>
+                <p>You haven't placed any orders. Explore our products and find something you love!</p>
+                <a href="{% url 'products:list' %}" class="btn btn-accent">
+                    Start Shopping
+                </a>
+            </div>
+        {% endif %}
+
+    </section>
+
+</div>{# /profile-container #}
+</div>{# /profile-page-wrap #}
+
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    const trigger     = document.getElementById('profile-edit-trigger');
+    const contentArea = document.getElementById('profile-content-area');
+    const cancelBtn   = document.getElementById('profile-cancel-btn');
+
+    /* Toggle .editing class on the shared container.
+       CSS hides info-grid when .editing is present,
+       and hides edit-card when .editing is absent. */
+    function openEdit() {
+        contentArea.classList.add('editing');
+        trigger.setAttribute('aria-expanded', 'true');
+        // Scroll smoothly to the top of the form area
+        document.getElementById('profile-edit-section')
+                .scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeEdit() {
+        contentArea.classList.remove('editing');
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    if (trigger) {
+        trigger.addEventListener('click', function () {
+            contentArea.classList.contains('editing') ? closeEdit() : openEdit();
+        });
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeEdit);
+    }
+
+    // Server returned edit_mode=True (form had errors) — keep form visible
+    {% if edit_mode %}
+    openEdit();
+    {% endif %}
+
+})();
+</script>
+{% endblock extra_js %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order History — StoreHub{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="section-header mt-3">
+        <h1>My Orders</h1>
+        <p class="text-muted">Track and view your past purchases</p>
+    </div>
+
+    {% if orders %}
+        <div class="orders-table-wrapper">
+            <div style="overflow-x: auto;">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Date Placed</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td><strong>{{ order.order_number }}</strong></td>
+                                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                <td>₹{{ order.total_amount }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ order.status }}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'orders:detail' order.id %}" class="btn btn-ghost btn-sm text-accent">View Details</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-cart fade-in">
+            <div class="empty-cart-icon">📦</div>
+            <h2>No Orders Yet</h2>
+            <p>You haven't placed any orders with us yet.</p>
+            <a href="{% url 'products:list' %}" class="btn btn-accent btn-lg mt-2">Start Shopping</a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock content %}

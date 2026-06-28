@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% static 'images/placeholder.jpg' as placeholder_url %}
+
+{% block title %}{{ product.name }} — StoreHub{% endblock %}
+{% block meta_description %}{{ product.description|truncatechars:160 }}{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Breadcrumb-style back link -->
+    <a href="{% url 'products:list' %}" class="back-link">
+        ← Back to Shop
+    </a>
+
+    <section class="detail-layout" aria-label="Product details">
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  PRODUCT IMAGE                                         -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="detail-img">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                     onerror="this.onerror=null;this.src='{{ placeholder_url }}'">
+            {% else %}
+                <img src="{{ placeholder_url }}" alt="No image available">
+            {% endif %}
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  PRODUCT INFO                                          -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="detail-info">
+            <!-- Category & Rating -->
+            <div class="product-meta">
+                <span class="product-category-badge" style="position:static;">{{ product.get_category_display }}</span>
+                <span class="product-rating">
+                    <span class="stars" aria-hidden="true">
+                        {% if product.rating >= 1 %}★{% else %}☆{% endif %}{% if product.rating >= 2 %}★{% else %}☆{% endif %}{% if product.rating >= 3 %}★{% else %}☆{% endif %}{% if product.rating >= 4 %}★{% else %}☆{% endif %}{% if product.rating >= 5 %}★{% else %}☆{% endif %}
+                    </span>
+                    <span>{{ product.rating }} / 5.0</span>
+                </span>
+            </div>
+
+            <h1>{{ product.name }}</h1>
+
+            <!-- Price -->
+            <div class="detail-price">
+                <span class="currency">₹</span>{{ product.price }}
+            </div>
+
+            <!-- Stock Status -->
+            <div class="mb-3">
+                {% if product.is_in_stock %}
+                    <span class="stock-badge in-stock">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                        In Stock ({{ product.stock }} available)
+                    </span>
+                {% else %}
+                    <span class="stock-badge out-of-stock">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        Out of Stock
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="detail-description">
+                <h4>Description</h4>
+                <div>{{ product.description|linebreaks }}</div>
+            </div>
+
+            <!-- Add to Cart Form -->
+            {% if product.is_in_stock %}
+                <form action="{% url 'cart:add' product.id %}" method="post" class="add-to-cart-form">
+                    {% csrf_token %}
+                    <label for="detail-qty" class="visually-hidden">Quantity</label>
+                    <select name="quantity" id="detail-qty">
+                        {% for i in quantity_range %}
+                            <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-accent btn-lg" id="add-to-cart-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                        Add to Cart
+                    </button>
+                </form>
+            {% else %}
+                <button class="btn btn-lg" disabled style="background: var(--color-border); color: var(--color-text-muted); cursor: not-allowed;">
+                    Out of Stock
+                </button>
+            {% endif %}
+        </div>
+    </section>
+
+</div>
+{% endblock content %}
